@@ -10,6 +10,9 @@ services:
     startCommand: "gunicorn wsgi --chdir ./src/"
     plan: free # optional; defaults to starter
     numInstances: 1
+    systemPackages:
+      - graphviz
+      - libgraphviz-dev
     envVars:
       - key: BASENAME
         value: /
