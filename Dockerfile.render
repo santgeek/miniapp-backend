@@ -27,15 +27,16 @@ RUN apt update \
 
 WORKDIR /opt/app
 
-COPY --from=python_builder /root/.local/share/virtualenvs/<YOUR_PROJECT_NAME>-* /opt/app/venv
+COPY --from=python_builder /root/.local/share/virtualenvs/miniapp-backend-* /opt/app/venv
+
+RUN find /opt/app/venv -name "gunicorn"
+
 COPY . /opt/app/src
 
-ENV PATH="/opt/app/venv/bin:$PATH" # Ensure your venv's binaries are in PATH
+ENV PATH="/opt/app/venv/bin:$PATH" 
 ENV NODE_ENV=container
 ENV FLASK_APP=src/app.py
 ENV BASENAME=/
-ENV DEBUG=TRUE # Set to FALSE for production!
+ENV DEBUG=TRUE 
 
-# Define the default command to run your application.
-# Render's startCommand in render.yaml will override this if specified.
 CMD ["/opt/app/venv/bin/gunicorn", "wsgi", "--chdir", "/opt/app/src"]
