@@ -6,8 +6,7 @@ set -o errexit
 # npm install
 # npm run build
 
-apt-get update -y
-apt-get install -y graphviz libgraphviz-dev
+sudo apt-get update -y && sudo apt-get install -y graphviz libgraphviz-dev
 
 pipenv install
 
