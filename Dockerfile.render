@@ -1,19 +1,20 @@
-# ... (previous parts of Dockerfile.render, including 'COPY requirements.txt' and 'RUN pip install -r requirements.txt') ...
+# En la etapa final, después de copiar los paquetes, instala gunicorn
+FROM node:16 as final_stage
 
-# Copy the Python installation (including site-packages and executables) from the builder stage
+RUN apt update \
+    && apt install -y --no-install-recommends software-properties-common \
+    && add-apt-repository ppa:deadsnakes/ppa \
+    && apt update \
+    && apt install -y --no-install-recommends python3.10 \
+    && apt install -y --no-install-recommends graphviz 
+
+WORKDIR /opt/app
+
 COPY --from=python_builder /usr/local/lib/python3.10/site-packages/ /usr/local/lib/python3.10/site-packages/
 COPY --from=python_builder /usr/local/bin/ /usr/local/bin/
 
-# --- TEMPORARY DEBUGGING STEPS: ADD THESE LINES ---
-# This will list the contents of /usr/local/bin/. We need to see if 'gunicorn' is here.
-RUN echo "--- Contents of /usr/local/bin/ ---"
-RUN ls -la /usr/local/bin/
-RUN echo "------------------------------------"
-
-# This command will explicitly check if 'gunicorn' exists in /usr/local/bin.
-# If it does NOT exist, the build will fail with a clear error message.
-RUN test -f /usr/local/bin/gunicorn || (echo "ERROR: gunicorn executable WAS NOT FOUND in /usr/local/bin! Build Failed." && exit 1)
-# -------------------------------------------------
+# Instala gunicorn en la etapa final
+RUN pip install gunicorn
 
 COPY . /opt/app/src
 
@@ -21,6 +22,6 @@ ENV PATH="/usr/local/bin:$PATH"
 ENV NODE_ENV=container
 ENV FLASK_APP=src/app.py
 ENV BASENAME=/
-ENV DEBUG=TRUE
+ENV DEBUG=TRUE 
 
 CMD ["gunicorn", "wsgi", "--chdir", "/opt/app/src"]
