@@ -1,6 +1,8 @@
 
 FROM python:3.10-slim-buster as python_builder
 
+ENV PIPENV_VENV_IN_PROJECT=true
+
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     graphviz \
@@ -27,7 +29,7 @@ RUN apt update \
 
 WORKDIR /opt/app
 
-COPY --from=python_builder /root/.local/share/virtualenvs/miniapp-backend-* /opt/app/venv
+COPY --from=python_builder /app/.venv /opt/app/venv
 
 RUN find /opt/app/venv -name "gunicorn"
 
