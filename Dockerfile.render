@@ -1,14 +1,41 @@
+
+FROM python:3.10-slim-buster as python_builder
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    graphviz \
+    libgraphviz-dev
+
+RUN pip install pipenv
+
+WORKDIR /app
+
+COPY Pipfile Pipfile.lock ./
+
+
+RUN pipenv install --python /usr/local/bin/python3.10 && \
+    pipenv run pip install --no-deps --upgrade pip setuptools wheel
+
 FROM node:16
 
 RUN apt update \
-    && apt install software-properties-common \
+    && apt install -y --no-install-recommends software-properties-common \
     && add-apt-repository ppa:deadsnakes/ppa \
     && apt update \
-    && apt install -y python3.10 \
-    && apt install -y graphviz libgraphviz-dev
+    && apt install -y --no-install-recommends python3.10 \
+    && apt install -y --no-install-recommends graphviz # Runtime library needed here
 
 WORKDIR /opt/app
-COPY --from=build /opt/app/venv /venv
 
-ENV PATH="/opt/app/venv/bin:$PATH"
+COPY --from=python_builder /root/.local/share/virtualenvs/<YOUR_PROJECT_NAME>-* /opt/app/venv
+COPY . /opt/app/src
+
+ENV PATH="/opt/app/venv/bin:$PATH" # Ensure your venv's binaries are in PATH
 ENV NODE_ENV=container
+ENV FLASK_APP=src/app.py
+ENV BASENAME=/
+ENV DEBUG=TRUE # Set to FALSE for production!
+
+# Define the default command to run your application.
+# Render's startCommand in render.yaml will override this if specified.
+CMD ["/opt/app/venv/bin/gunicorn", "wsgi", "--chdir", "/opt/app/src"]

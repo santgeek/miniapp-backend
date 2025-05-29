@@ -7,8 +7,8 @@ services:
     name: miniapp-backend
     dockerfile: Dockerfile.render
     # env: python # valid values: https://render.com/docs/yaml-spec#environment
-    buildCommand: "./render_build.sh"
-    startCommand: "gunicorn wsgi --chdir ./src/"
+    # buildCommand: "./render_build.sh"
+    startCommand: "/opt/app/venv/bin/gunicorn wsgi --chdir /opt/app/src/"
     plan: free # optional; defaults to starter
     numInstances: 1
     envVars:
