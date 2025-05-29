@@ -1,4 +1,3 @@
-
 FROM python:3.10-slim-buster as python_builder
 
 ENV PIPENV_VENV_IN_PROJECT=true
@@ -14,7 +13,6 @@ WORKDIR /app
 
 COPY Pipfile Pipfile.lock ./
 
-
 RUN pipenv install --python /usr/local/bin/python3.10 && \
     pipenv run pip install --no-deps --upgrade pip setuptools wheel
 
@@ -25,20 +23,23 @@ RUN apt update \
     && add-apt-repository ppa:deadsnakes/ppa \
     && apt update \
     && apt install -y --no-install-recommends python3.10 \
-    && apt install -y --no-install-recommends graphviz # Runtime library needed here
+    && apt install -y --no-install-recommends graphviz
 
 WORKDIR /opt/app
 
 COPY --from=python_builder /app/.venv /opt/app/venv
 
 RUN find /opt/app/venv -name "gunicorn"
+# ------------------------------------------------------------------------------------
 
 COPY . /opt/app/src
 
-ENV PATH="/opt/app/venv/bin:$PATH" 
+ENV PATH="/opt/app/venv/bin:$PATH"
+# ----------------------------------------------------------------------------
+
 ENV NODE_ENV=container
 ENV FLASK_APP=src/app.py
 ENV BASENAME=/
-ENV DEBUG=TRUE 
+ENV DEBUG=TRUE # Set to FALSE for production!
 
 CMD ["/opt/app/venv/bin/gunicorn", "wsgi", "--chdir", "/opt/app/src"]
