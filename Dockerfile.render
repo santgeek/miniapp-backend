@@ -6,7 +6,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     graphviz \
     libgraphviz-dev \
-    gcc 
+    gcc
 
 WORKDIR /app
 
@@ -19,24 +19,38 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Stage 2: Final Runtime Stage
 FROM node:16 as final_stage
 
-# Install runtime system dependencies for Graphviz and Python 3.10
 RUN apt update \
     && apt install -y --no-install-recommends software-properties-common \
     && add-apt-repository ppa:deadsnakes/ppa \
     && apt update \
     && apt install -y --no-install-recommends python3.10 \
-    && apt install -y --no-install-recommends graphviz 
+    && apt install -y --no-install-recommends graphviz
 
 WORKDIR /opt/app
 
-# Copy the Python installation (including site-packages and executables) from the builder stage
+# Copy Python installation and executables
 COPY --from=python_builder /usr/local/lib/python3.10/site-packages/ /usr/local/lib/python3.10/site-packages/
 COPY --from=python_builder /usr/local/bin/ /usr/local/bin/
 
-# --- NEW: Copy the start.sh script and make it executable ---
+# --- AGGRESSIVE DEBUGGING FOR start.sh COPY ---
+# This line attempts to copy start.sh
 COPY start.sh /opt/app/start.sh
+
+# Immediately after copying, list contents of /opt/app/ to confirm start.sh is there.
+# This output MUST appear in your build logs if the build is successful up to this point.
+RUN echo "--- Contents of /opt/app/ during build stage ---" && \
+    ls -la /opt/app/ && \
+    echo "-----------------------------------------------"
+
+# Verify start.sh exists. If it does NOT exist, this command will fail the entire build.
+RUN test -f /opt/app/start.sh || (echo "BUILD ERROR: start.sh file NOT found in /opt/app/ after COPY!" && exit 1)
+
+# Verify start.sh is executable. If it's not, this will also fail the build.
+RUN test -x /opt/app/start.sh || (echo "BUILD ERROR: start.sh is NOT executable in /opt/app/!" && exit 1)
+
+# Ensure executable permissions (redundant if previous test passed, but harmless)
 RUN chmod +x /opt/app/start.sh
-# -------------------------------------------------------------
+# ------------------------------------------------
 
 COPY . /opt/app/src
 
