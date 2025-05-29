@@ -13,14 +13,6 @@ class User(db.Model):
     password: Mapped[str] = mapped_column(String(18), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
 
-
-class TokenBlockedList(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-    jti: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
-
-    def __repr__(self):
-        return f'<User {self.email}>'
-
     def to_dict(self):
         return {
             "id": self.id,
@@ -29,3 +21,12 @@ class TokenBlockedList(db.Model):
             "is_active": self.is_active
             # do not serialize the password, its a security breach
         }
+
+class TokenBlockedList(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    jti: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+    def __repr__(self):
+        return f'<User {self.email}>'
+
+    

@@ -57,10 +57,10 @@ def sitemap():
 
 @app.route('/user', methods=['GET'])
 def handle_users():
-    users = db.session.execute(select(User)).scalars().all()
-    users_serialized = [user.to_dict() for user in users]
+    all_users = User.query.all()
+    serialized_users = [user.to_dict() for user in all_users]
 
-    return jsonify(users_serialized), 200
+    return jsonify(serialized_users), 200
 
 
 @app.route('/register', methods=['POST'])
