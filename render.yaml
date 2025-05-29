@@ -6,7 +6,7 @@ services:
     region: ohio
     name: miniapp-backend
     dockerfile: Dockerfile.render
-    startCommand: "/opt/app/start.sh"
+    startCommand: "/usr/local/bin/start.sh"
     plan: free # optional; defaults to starter
     numInstances: 1
     envVars:
