@@ -11,6 +11,7 @@ from utils import APIException, generate_sitemap
 from admin import setup_admin
 from models import db, User, TokenBlockedList
 from flask_bcrypt import Bcrypt
+from sqlalchemy.exc import NoResultFound
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt, JWTManager
 
 
@@ -66,50 +67,89 @@ def handle_users():
 @app.route('/register', methods=['POST'])
 def add_user():
     user_data = request.get_json()
-    if user_data["name"] is None:
+    if not user_data:
+        return jsonify({"message": "Invalid JSON or empty request body"}), 400
+
+    name = user_data.get("name")
+    email = user_data.get("email")
+    password = user_data.get("password")
+
+    if name is None:
         return jsonify({"message": "No name entered"}), 400
-    if user_data["email"] is None:
+    if email is None:
         return jsonify({"message": "No email entered"}), 400
-    if user_data["password"] is None:
+    if password is None:
         return jsonify({"message": "No password entered"}), 400
 
-    user_data["password"] = bcrypt.generate_password_hash(
-        user_data["password"]).decode('utf-8')
-    new_user = User(
-        name=user_data["name"],
-        email=user_data["email"],
-        password=user_data["password"],
-        is_active=True)
+    if "@" not in email or "." not in email:
+        return jsonify({"message": "Invalid mail format"}), 400
 
-    db.session.add(new_user)
-    db.session.commit()
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        return jsonify({"message": "User already registered"}), 409
 
-    return jsonify({"message": "Successful registration"}), 201
+    if len(password) < 6:
+        return jsonify({"message": "Password must have a minimum of 6 characters"})
+
+    try:
+        hashed_password = bcrypt.generate_password_hash(
+            password).decode('utf-8')
+
+        new_user = User(
+            name=name,
+            email=email,
+            password=hashed_password,
+            is_active=True
+        )
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        return jsonify({"message": "Successful registration", "user_id": new_user.id}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Registration error: {e}")
+        return jsonify({"message": "Failed registration"}), 500
 
 
 @app.route('/login', methods=['POST'])
 def login_user():
     login_data = request.get_json()
 
-    if login_data["email"] is None:
+    if not login_data:
+        return jsonify({"message": "Invalid JSON or empty request body"}), 400
+
+    email = login_data.get("email")
+    password = login_data.get("password")
+
+    if email is None:
         return jsonify({"message": "No email entered"}), 400
-    if login_data["password"] is None:
+    if password is None:
         return jsonify({"message": "No password entered"}), 400
 
-    user = db.session.execute(select(User).where(
-        User.email == login_data["email"])).scalar_one()
-    if user is None:
-        return jsonify({"message": "User not found"}), 401
-    valid_password = bcrypt.check_password_hash(
-        user.password, login_data["password"])
-    if not valid_password:
-        return jsonify({"message": "Invalid password"}), 401
+    user = None
 
-    token = create_access_token(
-        identity=user.id,
-        additional_claims={"role": "admin"})
+    try:
+        user = db.session.execute(select(User).where(
+            User.email == email)).scalar_one_or_none()
+        if user is None:
+            return jsonify({"message": "Invalid credentials"}), 401
 
-    return jsonify({"token": token, "user_id": user.id})
+        valid_password = bcrypt.check_password_hash(user.password, password)
+        if not valid_password:
+            return jsonify({"message": "Invalid credentials"}), 401
+
+        token = create_access_token(
+            identity=user.id,
+            # additional_claims={"role": "admin"}
+        )
+
+        return jsonify({"token": token, "user_id": user.id, "message": "Login successful"}), 200
+
+    except Exception as e:
+        print(f"Login error: {e}")
+        return jsonify({"message": "Failed login. Please try again later"}), 500
 
 
 @app.route('/admin', methods=['GET'])
