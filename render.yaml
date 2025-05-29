@@ -6,8 +6,6 @@ services:
     region: ohio
     name: miniapp-backend
     dockerfile: Dockerfile.render
-    # env: python # valid values: https://render.com/docs/yaml-spec#environment
-    # buildCommand: "./render_build.sh"
     startCommand: "/opt/app/venv/bin/gunicorn wsgi --chdir /opt/app/src/"
     plan: free # optional; defaults to starter
     numInstances: 1
@@ -18,8 +16,6 @@ services:
         value: src/app.py
       - key: DEBUG
         value: TRUE
-      #- key: PYTHON_VERSION
-      # value: 3.10.6
       - key: DATABASE_URL # Render PostgreSQL database
         fromDatabase:
           name: flask-rest-42170
