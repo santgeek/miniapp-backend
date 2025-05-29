@@ -6,7 +6,7 @@ services:
     region: ohio
     name: miniapp-backend
     dockerfile: Dockerfile.render
-    # startCommand: "gunicorn wsgi --chdir /opt/app/src/"
+    startCommand: "gunicorn wsgi --chdir /opt/app/src/"
     plan: free # optional; defaults to starter
     numInstances: 1
     envVars:
