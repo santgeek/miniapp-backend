@@ -29,8 +29,13 @@ WORKDIR /opt/app
 
 COPY --from=python_builder /app/.venv /opt/app/venv
 
-RUN find /opt/app/venv -name "gunicorn"
-# ------------------------------------------------------------------------------------
+# --- NEW TEMPORARY DEBUGGING STEPS ---
+# 1. List contents of the venv's bin directory
+RUN ls -la /opt/app/venv/bin/
+# 2. Check if gunicorn exists and exit with an error if it doesn't
+RUN test -f /opt/app/venv/bin/gunicorn || (echo "ERROR: gunicorn not found in /opt/app/venv/bin!" && exit 1)
+# -------------------------------------
+
 
 COPY . /opt/app/src
 
