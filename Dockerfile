@@ -34,6 +34,7 @@ COPY . /opt/app/src
 
 ENV PATH="/usr/local/bin:$PATH"
 ENV LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
+ENV PYTHONPATH="/opt/app/src:$PYTHONPATH"
 ENV NODE_ENV=container
 ENV FLASK_APP=src/app.py
 ENV BASENAME=/
