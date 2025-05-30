@@ -24,22 +24,16 @@ WORKDIR /opt/app
 
 COPY --from=python_builder /usr/local/lib/python3.10/site-packages/ /usr/local/lib/python3.10/site-packages/
 COPY --from=python_builder /usr/local/bin/ /usr/local/bin/
-COPY --from=python_builder /usr/local/lib/python3.10/ /usr/local/lib/python3.10/
+COPY --from=python_builder /usr/local/lib/python3.10/ /usr/local/lib/python3.10/ 
+COPY --from=python_builder /usr/local/lib/ /usr/local/lib/
 
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh 
 
-RUN echo "--- Contents of /usr/local/bin/ during build stage ---" && \
-    ls -la /usr/local/bin/ && \
-    echo "-----------------------------------------------"
-
-RUN test -f /usr/local/bin/start.sh || (echo "BUILD ERROR: start.sh file NOT found in /usr/local/bin/ after COPY!" && exit 1)
-RUN test -x /usr/local/bin/start.sh || (echo "BUILD ERROR: start.sh not executable in /usr/local/bin/!" && exit 1)
-# -----------------------------------------------------------------
-
 COPY . /opt/app/src 
 
 ENV PATH="/usr/local/bin:$PATH"
+ENV LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
 ENV NODE_ENV=container
 ENV FLASK_APP=src/app.py
 ENV BASENAME=/
