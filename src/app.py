@@ -28,15 +28,6 @@ if db_url is not None:
         "postgres://", "postgresql://")
 else:
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:////tmp/test.db"
-
-# --- START OF TEMPORARY DEBUG CODE ---
-# CAUTION: This will print your database credentials (username, password, host)
-# to your public Render logs.
-# YOU MUST REMOVE THESE LINES IMMEDIATELY AFTER DIAGNOSIS!
-print(
-    f"DEBUGGING DATABASE_URL (FROM APP.PY): {app.config['SQLALCHEMY_DATABASE_URI']}")
-# --- END OF TEMPORARY DEBUG CODE ---
-
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
