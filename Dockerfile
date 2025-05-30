@@ -30,13 +30,13 @@ COPY --from=python_builder /usr/local/lib/ /usr/local/lib/
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh 
 
-COPY . /opt/app/src 
+COPY . /opt/app 
 
 ENV PATH="/usr/local/bin:$PATH"
 ENV LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
-ENV PYTHONPATH="/opt/app/src:$PYTHONPATH"
+ENV PYTHONPATH="/opt/app:$PYTHONPATH"
 ENV NODE_ENV=container
-ENV FLASK_APP=src/app.py
+ENV FLASK_APP=src.wsgi
 ENV BASENAME=/
 ENV DEBUG=TRUE 
 
