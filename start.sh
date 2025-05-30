@@ -10,6 +10,12 @@ echo "--- Contents of /usr/local/bin/ ---"
 ls -la /usr/local/bin/
 echo "------------------------------------"
 
+# --- Run database migrations ---
+echo "Running database migrations..."
+python -m flask db upgrade
+echo "Migrations complete."
+# --- End of database migration section ---
+
 which gunicorn
 
 gunicorn --bind 0.0.0.0:10000 src.wsgi:application
