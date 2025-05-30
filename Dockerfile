@@ -24,6 +24,7 @@ WORKDIR /opt/app
 
 COPY --from=python_builder /usr/local/lib/python3.10/site-packages/ /usr/local/lib/python3.10/site-packages/
 COPY --from=python_builder /usr/local/bin/ /usr/local/bin/
+COPY --from=python_builder /usr/local/lib/python3.10/ /usr/local/lib/python3.10/
 
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh 
