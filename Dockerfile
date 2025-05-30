@@ -5,7 +5,8 @@ RUN apt-get update && \
     graphviz \
     libgraphviz-dev \
     gcc \
-    default-libmysqlclient-dev
+    default-libmysqlclient-dev \
+    pkg-config
 
 WORKDIR /app
 
