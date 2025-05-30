@@ -15,11 +15,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 FROM node:16 as final_stage
 
 RUN apt update \
-    && apt install -y --no-install-recommends software-properties-common \
-    && add-apt-repository ppa:deadsnakes/ppa \
-    && apt update \
-    && apt install -y --no-install-recommends python3.10 \
-    && apt install -y --no-install-recommends graphviz
+    && apt install -y --no-install-recommends graphviz 
+    
 
 WORKDIR /opt/app
 
