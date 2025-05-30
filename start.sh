@@ -1,15 +1,15 @@
 #!/bin/bash
+
 echo "--- Starting application using start.sh ---"
 
-# Explicitly set the PATH to ensure gunicorn is found
-export PATH="/usr/local/bin:$PATH"
+# Set the current working directory to where your app code is copied
+cd /opt/app/src 
 
 echo "Current PATH: $PATH"
-
 echo "--- Contents of /usr/local/bin/ ---"
 ls -la /usr/local/bin/
 echo "------------------------------------"
 
-echo "Attempting to find gunicorn with 'which': $(which gunicorn)"
+which gunicorn
 
-exec gunicorn wsgi --chdir ./src/
+gunicorn --bind 0.0.0.0:10000 wsgi:app
