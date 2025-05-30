@@ -1,6 +1,6 @@
 import os
 from flask_admin import Admin
-from models import db, User, TokenBlockedList
+from .models import db, User, TokenBlockedList
 from flask_admin.contrib.sqla import ModelView
 
 
