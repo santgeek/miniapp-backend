@@ -12,4 +12,4 @@ echo "------------------------------------"
 
 which gunicorn
 
-gunicorn --bind 0.0.0.0:10000 wsgi:app
+gunicorn --bind 0.0.0.0:10000 src.wsgi:app
