@@ -4,13 +4,13 @@
 
 Este es el servicio de backend para la MiniApp. Fue construido utilizando Flask y Python. Esta plataforma aloja los endpoints de la API necesarios para la funcionalidad de registro, login y obtención de datos de usuarios presentes en la base de datos.
 
-## Funcinoalidades
+## Funcionalidades
 
 - Registro y login de usuarios.
 - Autentificación con JWT.
 - Migraciones a la base de datos usando Alembic.
 
-## Technologies Used
+## Tecnologías usadas
 
 - **Python**: Programming Language
 - **Flask**: Web Framework
